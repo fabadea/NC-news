@@ -2,46 +2,42 @@ const {
   userData,
   topicData,
   articleData,
-  commentData
-} = require("../db/data/index");
+  commentData,
+} = require('../db/data/index');
 const {
   artDateFormat,
   makeUserLookup,
   makeArticleLookup,
-  formatArticles
-} = require("../db/utils/index");
+  formatArticles,
+} = require('../db/utils/index');
 
-exports.seed = function(knex, Promise) {
+exports.seed = function (knex, Promise) {
   return Promise.all([
-    knex("comments").del(),
-    knex("articles").del(),
-    knex("users").del(),
-    knex("topics").del()
+    knex('comments').del(),
+    knex('articles').del(),
+    knex('users').del(),
+    knex('topics').del(),
   ])
-    .then(() =>
-      knex("topics")
-        .insert(topicData)
-        .returning("*")
-    )
-    .then(() =>
-      knex("users")
-        .insert(userData)
-        .returning("*")
-    )
-    .then(users => {
+    .then(() => knex('topics')
+      .insert(topicData)
+      .returning('*'))
+    .then(() => knex('users')
+      .insert(userData)
+      .returning('*'))
+    .then((users) => {
       const userLookup = makeUserLookup(users);
       const dataFormatted = artDateFormat(articleData, userLookup);
       return Promise.all([
-        knex("articles")
+        knex('articles')
           .insert(dataFormatted)
-          .returning("*"),
-        userLookup
+          .returning('*'),
+        userLookup,
       ]);
     })
-    .then(articlesRows => {
+    .then((articlesRows) => {
       const [articles, users] = articlesRows;
       const articleLookup = makeArticleLookup(articles);
       const formattedArtis = formatArticles(commentData, articleLookup, users);
-      return knex("comments").insert(formattedArtis);
+      return knex('comments').insert(formattedArtis);
     });
 };
