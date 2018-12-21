@@ -1,31 +1,27 @@
-exports.artDateFormat = (articleData, lookupObj) => articleData.map((article) => {
-  const usefulArt = {};
-  usefulArt.title = article.title;
-  usefulArt.topic = article.topic;
-  usefulArt.body = article.body;
-  usefulArt.votes = article.votes;
-  usefulArt.created_at = new Date(article.created_at);
-  usefulArt.username = lookupObj[article.username];
-  return usefulArt;
-});
+const { articleData, commentData } = require('../data');
 
-exports.makeUserLookup = userData => userData.reduce((acc, user) => {
-  const key = user.username;
-  acc[key] = user.username;
-  return acc;
-}, {});
+exports.formatArticlesData = function () {
+  return articleData.map(({ created_at, created_by, ...restObj }) => ({
+    created_at: new Date(created_at),
+    username: created_by,
+    ...restObj,
+  }));
+};
 
-exports.makeArticleLookup = articleData => articleData.reduce((acc, article) => {
-  acc[article.title] = article.article_id;
-  return acc;
-}, {});
-
-exports.formatArticles = (commentData, articleLookup, userLookup) => commentData.map((comment) => {
-  const usefulCom = {};
-  usefulCom.username = userLookup[comment.username];
-  usefulCom.article_id = articleLookup[comment.belongs_to];
-  usefulCom.created_at = new Date(comment.created_at);
-  usefulCom.votes = comment.votes;
-  usefulCom.body = comment.body;
-  return usefulCom;
-});
+exports.formatCommentsData = function (articles_table) {
+  return commentData.map(
+    ({
+      belongs_to, created_by, created_at, ...restObj
+    }) => {
+      const matchedArticle = articles_table.filter(
+        article => article.title === belongs_to,
+      );
+      return {
+        article_id: matchedArticle[0].article_id,
+        created_at: new Date(created_at),
+        username: created_by,
+        ...restObj,
+      };
+    },
+  );
+};

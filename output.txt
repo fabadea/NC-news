@@ -17,3 +17,6 @@ You are now connected to database "test_nc_news" as user "flaviu".
  rogersop      | https://avatars2.githubusercontent.com/u/24394918?s=400&v=4           | paul
 (3 rows)
 
+q:
+article 13
+calling knex without a tableName is deprecated. Use knex.queryBuilder() instead.
